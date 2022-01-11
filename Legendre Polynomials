@@ -1,0 +1,45 @@
+def LP(n, x):  
+    if(n == 0): 
+        return 1 
+    elif(n == 1): 
+        return x  
+    else: 
+        return (((2 * n)-1)*x * LP(n-1, x)-(n-1)*LP(n-2, x))/float(n) 
+n = 5
+x = np.linspace(-1.0,1.0)
+
+y0=np.empty(len(x))
+for j in range(len(x)):
+       y0[j]=LP(0,x[j])
+
+y1=np.empty(len(x))
+for j in range(len(x)):
+       y1[j]=LP(1,x[j])
+
+y2=np.empty(len(x))
+for j in range(len(x)):
+       y2[j]=LP(2,x[j])
+        
+y3=np.empty(len(x))
+for j in range(len(x)):
+       y3[j]=LP(3,x[j])
+        
+y4=np.empty(len(x))
+for j in range(len(x)):
+       y4[j]=LP(4,x[j])
+        
+y5=np.empty(len(x))
+for j in range(len(x)):
+       y5[j]=LP(5,x[j])
+        
+plt.plot(x,y0,label="y0")
+plt.plot(x,y1,label="y1")
+plt.plot(x,y2,label="y2") 
+plt.plot(x,y3,label="y3") 
+plt.plot(x,y4,label="y4")
+plt.plot(x,y5,label="y5") 
+
+plt.legend(loc="best")
+plt.xlabel("X")
+plt.ylabel("Pn")
+plt.title("Legendre Polynomials")
