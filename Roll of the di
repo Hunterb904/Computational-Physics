@@ -1,0 +1,60 @@
+import random as rn
+import numpy as np
+import matplotlib.pyplot as plt
+from collections import Counter
+from statistics import median
+from math import sin,cos
+
+
+def dice(numb_of_dice):
+    dicerolls1=[]
+    dicerolls2 = []
+    dicerolls=[]
+    for count in range(numb_of_dice):
+        dicerolls1.append(rn.randint(1,6))
+        dicerolls2.append(rn.randint(1,6))
+        dicerolls.append(dicerolls1[count]+dicerolls2[count])
+    return(dicerolls)
+
+def results(n):
+    
+    print("")
+    print("this is for",n,"pairs of dice")      
+    
+    x=[]
+    dicestats = []
+    dicerolls = dice(n)
+    avg = sum(dicerolls)/(len(dicerolls))
+    med = median(dicerolls)
+    
+    for numb in range(1,12):
+        dicestats.append(dicerolls.count(numb))
+        
+    for count in range(n):
+        x.append((dicerolls[count]-avg)**2)
+    stand=(sum(x)/len(dicerolls))**2
+    
+    #print(dicestats) #starting at 1, so the first value will always be 0. the number of times that the summation of two values equals said number
+         #commeneted out since not nessisary, but nice to see. 
+
+    print('the average value of two dice is',avg)
+    print('the median value is',med)
+    print('the standard deviation',round(stand,1))
+    
+    plt.grid(axis='y', alpha=0.75)
+    plt.xlabel('Value')
+    plt.ylabel('Frequency')
+    plt.title('Number of two die added together for said value')     #graphing stuff
+    plt.hist(dicerolls)
+    plt.axvline(x = med, color = 'r', linestyle = '-',label ='median') #med
+    plt.axvline(x = avg, color = 'b', linestyle = '-',label ='average') #avg
+    plt.legend(loc="best")
+    return
+
+results(100)
+plt.show()
+results(300)
+plt.show()
+results(1000)
+plt.show()
+#does not update the stats, but only the hist
