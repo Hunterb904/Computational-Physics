@@ -1,0 +1,84 @@
+#finding semi-major axis and astronomical unit for each planet
+import math as m
+import numpy as np
+import matplotlib.pyplot as plt 
+
+p_name=['b','c','d','e','f','g','h']
+o_period=np.array([1.5109, 2.4218, 4.0498, 6.0996, 9.2065, 12.3528, 18.7663])
+p_radius=np.array([1.086, 1.056, 0.772, 0.918, 1.045, 1.127, 0.715])
+p_mass=np.array([0.79, 1.63, 0.33, 0.24, 0.36, 0.566, 0.086])
+
+sma=(o_period/365.25)**(2/3)
+
+
+for i in range (len(p_name)):
+    print("Planet " + str(p_name[i]) + ": semi-major axis = " + str(format(sma[i], ".2E")) + " AU = " + str(format(sma[i] * (1.5*10**8), ".2E")) + " km") 
+    
+#function to draw circle and graph planet orbitals
+z=1000
+def circle(x_0,y_0,R,z):
+    x,y=np.array([]),np.array([])
+    d=2*(np.pi)/(z-1)
+    e=2*(np.pi)+(d/2)
+    theta=np.arange(0,2*np.pi,d)
+    for i in range(len(theta)):
+        x=np.append(x,R*m.cos(theta[i])+x_0)
+        y=np.append(y,R*m.sin(theta[i])+y_0)
+    return x,y 
+    
+plt.figure(figsize=(12,12))
+
+for i in range (len(p_name)):
+    xy=circle(0,0,sma[i],z)
+    plt.plot(xy[0],xy[1],':',c='k')
+plt.xlabel('x[AU]')
+plt.ylabel('y[AU]')
+plt.title('Trappist-1 Planet Orbital')
+    
+s_radius = 35*(12.45 * 6371) / (1.5*10**8)
+plt.plot(circle(0,0,s_radius,z)[0],circle(0,0,s_radius,z)[1],c='r')
+    
+for i in range (len(p_name)):
+    xy=circle(sma[i],0,p_radius[i] *6371*35 / (1.5*10**8), z)
+    plt.plot(xy[0],xy[1])
+    
+#organizing data in a table
+au_meters = 1.5E11        # This sets up some constants
+mass_earth_kg = 5.972E24
+G=6.67E-11
+
+class ListTable(list):  #creates an html formatted table
+    def _repr_html_(self):
+        html = ["<table>"]
+        for row in self:
+            html.append("<tr>")
+            for col in row:
+                html.append("<td>{0}</td>".format(col))
+            html.append("</tr>")
+        html.append("</table>")
+        return ''.join(html)
+
+def mass_trap_sun(): # This determines the mass of the Trappist sun in earth masses
+  mass_sun_kg = 1.989E30
+  mass_trap_sun_kg = 0.08 * mass_sun_kg
+  return (mass_trap_sun_kg / mass_earth_kg)
+
+toe = np.array([])  # toe is the array of Total Orbital Energies used in the next cell
+table = ListTable()
+table.append(['Planet ','Orbital Radius [Days] ','Planet Radius [Earth Radii]', 'Planet Mass [Earth Masses]', 'Semi Mjaor Axis [AU]', 'Total Orbital Energy [J 10^33]']) # These are the titles of the columns
+
+for i in range(len(p_name)): # This loop fills in the values of the columns with the desired information
+  a_m = sma[i] * au_meters
+  totalOrbitalEnergy = G * (mass_trap_sun() * mass_earth_kg) * (p_mass[i] * mass_earth_kg) / (2 * a_m) # This finds the energy and also converts from earth masses to kg to be used in the equation
+  toe = np.append(toe,totalOrbitalEnergy)
+  table.append([p_name[i], round(o_period[i], 4), p_radius[i], p_mass[i], round(sma[i], 4), round(totalOrbitalEnergy / 1E33, 4)]) # This gives the values for every ith element of each array. It also rounds the numbers. The TOE is divided by 10^33 to represent the numbers more clearly.
+table
+
+#graphing orbital energy vs Distance
+for i in range(len(p_name)): # This plots the Trappist-1 System, Orbital Energy vs. Distance.
+    plt.scatter(toe[i] / 1*10**33, sma[i], 100) # The 100 is to make the points look bigger
+
+plt.xlabel('Total Orbital Energy [J 10^33]')
+plt.ylabel('Semi-Major Axis [AU]')
+plt.title("Trappist-1 System Orbital Energy vs. Distance")
+plt.rcParams.update({'font.size': 16})
